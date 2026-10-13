@@ -1,0 +1,26 @@
+{
+  "name": "Proofsheet",
+  "short_name": "Proofsheet",
+  "description": "Print many photos on one sheet. Crop, adjust colour, and save a print-ready PDF. Works offline.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "en",
+  "dir": "ltr",
+  "background_color": "#F7F7F5",
+  "theme_color": "#F7F7F5",
+  "categories": ["photo", "utilities", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "screenshots": [
+    { "src": "screenshots/desktop.png", "sizes": "1280x800", "type": "image/png", "form_factor": "wide", "label": "Photos, paper and a live sheet preview" },
+    { "src": "screenshots/mobile.png", "sizes": "780x1688", "type": "image/png", "form_factor": "narrow", "label": "Works the same on a phone" }
+  ]
+}

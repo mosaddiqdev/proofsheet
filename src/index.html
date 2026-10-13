@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Proofsheet: print photos on one sheet</title>
+<meta name="description" content="Print many photos on one sheet. Crop, adjust colour, and save a print-ready PDF. Works offline.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F7F7F5">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Proofsheet">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+<header class="hdr">
+ <div class="brand"><i></i>Proofsheet</div>
+ <div class="hdr-r"><button class="ghost" id="installBtn" type="button" hidden><span id="instIco"></span><span class="lbl">Install app</span></button><button class="ghost" id="openSet" type="button" aria-label="Shop settings"><span id="gear"></span><span class="lbl">Shop settings</span></button></div>
+</header>
+
+<main class="app">
+ <section class="panel" aria-label="Order options">
+  <div class="intro">
+   <h1>Fill a sheet with your photos</h1>
+   <p class="sub">Add photos, crop and tune each one, then choose paper and size.</p>
+  </div>
+
+  <section class="sec">
+   <div class="lab">Photos <span id="pcount"></span></div>
+   <ul class="plist" id="plist"></ul>
+   <label class="add empty" id="addPhotos"><input class="fin" type="file" accept="image/jpeg,image/png,image/webp" multiple aria-label="Add photos"><span class="r" id="addLab"></span><small>JPG or PNG. Drop or paste them anywhere.</small></label>
+  </section>
+
+  <section class="sec"><div class="lab">Paper <span>Sizes in mm</span></div><div class="chips" id="papers"></div></section>
+
+  <section class="sec">
+   <div class="lab">Photo size <span>Sizes in mm</span></div><div class="chips" id="sizes"></div>
+   <div class="two" id="custom" hidden>
+    <label class="num"><input id="cw" type="number" min="10" max="200" inputmode="decimal" aria-label="Width in millimetres"><span class="u">mm wide</span></label>
+    <label class="num"><input id="ch" type="number" min="10" max="200" inputmode="decimal" aria-label="Height in millimetres"><span class="u">mm tall</span></label>
+   </div>
+  </section>
+
+  <div class="dock">
+   <div class="tot">
+    <div id="priceBox"><div class="tl">Total</div><div class="price" id="price">–</div></div>
+    <p><b id="line1"></b><span id="line2"></span></p>
+   </div>
+   <button class="fill" id="fillBtn" type="button" hidden></button>
+   <div class="acts">
+    <button class="btn pri" id="print" type="button" disabled></button>
+    <button class="btn" id="dl" type="button" disabled aria-label="Download PDF"></button>
+   </div>
+  </div>
+ </section>
+
+ <section class="stage" aria-label="Sheet preview">
+  <div class="sbox">
+   <div class="rx"><span id="dx"></span></div>
+   <div class="ry"><span id="dy"></span></div>
+   <canvas id="sheet" role="img" aria-label="Sheet preview"></canvas>
+   <div class="addwrap" id="addwrap"><label class="btn pri" id="addBtn"><input class="fin" type="file" accept="image/jpeg,image/png,image/webp" multiple aria-label="Add photos">Add photos</label></div>
+  </div>
+  <div class="under">
+   <div class="pager" id="pager" hidden><button class="ib" id="pgPrev" type="button" aria-label="Previous sheet"></button><span id="pgLab"></span><button class="ib" id="pgNext" type="button" aria-label="Next sheet"></button></div>
+   <div class="cap" id="cap"></div>
+  </div>
+ </section>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="ed" class="ed" aria-labelledby="edT">
+ <div class="ed-h"><h2 id="edT">Edit photo</h2><span class="pill" id="edSize"></span></div>
+ <div class="ed-main">
+  <div class="ed-left">
+   <div id="cs"><canvas id="pv"></canvas><div id="fr"><svg id="fgs" aria-hidden="true"></svg><span id="frLab"></span></div></div>
+   <div class="ed-ctl">
+    <label class="zr"><span>Zoom</span><input type="range" id="zoom" min="1" max="4" step="0.01" value="1" aria-label="Zoom"></label>
+    <div class="ar">
+     <label id="fgRow"><input type="checkbox" id="fgOn" checked>Face guide</label>
+     <div class="grp"><button class="btn sm" id="edRot" type="button" aria-label="Rotate 90 degrees"><span id="rotIco"></span>Rotate</button><button class="btn sm" id="edAdj" type="button" aria-expanded="false" aria-controls="edPanel"><span id="adjIco"></span>Adjust<span id="chev"></span></button></div>
+    </div>
+   </div>
+  </div>
+  <aside class="ed-panel" id="edPanel"><div class="ed-in">
+   <div class="ed-top"><b>Adjust</b><button class="btn sm" id="edReset" type="button">Reset all</button></div>
+   <div class="qrow"><button class="q" id="edAuto" type="button">Auto</button><button class="q" id="edCast" type="button">Fix cast</button><button class="q" id="edPick" type="button" aria-pressed="false">Pick neutral</button></div>
+   <div id="adjList"></div>
+   <div class="ag"><div class="agl">Curves</div>
+    <div class="tabs" id="chTabs"></div>
+    <canvas id="curve" aria-label="Tone curve editor"></canvas>
+    <div class="crow"><span class="note">Click to add a point. Double-click a point to remove it.</span><button class="q" id="curveReset" type="button">Reset curve</button></div>
+   </div>
+   <button class="btn" id="edCmp" type="button">Hold to compare</button>
+   <p class="note">Double-click a slider to reset it. Pink or magenta cast? Use Pick neutral on something white or grey, or move Tint toward green.</p>
+  </div></aside>
+ </div>
+ <div class="ed-f"><button class="btn" id="edCancel" type="button">Cancel</button><button class="btn pri" id="edDone" type="button" autofocus>Done</button></div>
+</dialog>
+
+<dialog id="set" aria-labelledby="setT">
+ <div class="dh"><h2 id="setT">Shop settings</h2><button class="ghost" id="setClose" type="button" style="min-height:40px">Done</button></div>
+ <div class="db">
+  <div class="sec"><div class="lab">Price per photo</div><div id="priceRows" style="display:flex;flex-direction:column;gap:8px"></div></div>
+  <hr>
+  <label class="row"><span>Show total price to customers</span><input type="checkbox" id="sShow" style="width:22px;height:22px;accent-color:var(--ink)"></label>
+  <div class="row"><label for="sCur">Currency symbol</label><input class="in" id="sCur" maxlength="3"></div>
+  <div class="row"><label for="sMar">Sheet margin (mm)</label><input class="in" id="sMar" type="number" min="0" max="30" step="0.5"></div>
+  <div class="row"><label for="sGap">Gap between photos (mm)</label><input class="in" id="sGap" type="number" min="0" max="20" step="0.5"></div>
+  <label class="row"><span>Draw cut lines around photos</span><input type="checkbox" id="sCut" style="width:22px;height:22px;accent-color:var(--ink)"></label>
+  <p class="note">Sheet capacity is worked out automatically from paper and photo size. Prices and settings are saved on this device only.</p>
+ </div>
+</dialog>
+
+<script src="js/config.js"></script>
+<script src="js/store.js"></script>
+<script src="js/packing.js"></script>
+<script src="js/render.js"></script>
+<script src="js/grade.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/curves.js"></script>
+<script src="js/photos.js"></script>
+<script src="js/output.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/app.js"></script>
+<script src="js/pwa.js"></script>
+</body>
+</html>
